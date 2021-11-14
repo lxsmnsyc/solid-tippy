@@ -1,6 +1,6 @@
 # solid-tippy
 
-> SolidJS bindings for Tippy.js
+> SolidJS bindings for [Tippy.js](https://atomiks.github.io/tippyjs/)
 
 [![NPM](https://img.shields.io/npm/v/solid-tippy.svg)](https://www.npmjs.com/package/solid-tippy) [![JavaScript Style Guide](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)[![Open in CodeSandbox](https://img.shields.io/badge/Open%20in-CodeSandbox-blue?style=flat-square&logo=codesandbox)](https://codesandbox.io/s/github/LXSMNSYC/solid-tippy/tree/main/examples/solid-tippy-demo)
 
