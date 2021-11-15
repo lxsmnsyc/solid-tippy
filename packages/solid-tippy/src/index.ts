@@ -16,9 +16,10 @@ export interface TippyOptions {
 
 export function tippy<T extends Element>(
   target: T,
-  options?: TippyOptions,
+  opts: () => TippyOptions | undefined,
 ): void {
   createEffect(() => {
+    const options = opts();
     const instance = makeTippy(target, untrack(() => options?.props));
 
     createComputed(() => {
@@ -51,9 +52,10 @@ export function tippy<T extends Element>(
 
 export function tippyHeadless<T extends Element>(
   target: T,
-  options?: TippyOptions,
+  opts: () => TippyOptions | undefined,
 ): void {
   createEffect(() => {
+    const options = opts();
     const instance = makeHeadlessTippy(target, untrack(() => options?.props));
 
     createComputed(() => {
