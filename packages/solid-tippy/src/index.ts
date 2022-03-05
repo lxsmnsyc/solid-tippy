@@ -87,82 +87,88 @@ export function tippyHeadless<T extends Element>(
 }
 
 export function useTippy<T extends Element>(
-  target: () => T,
+  target: () => T | undefined | null,
   options?: TippyOptions,
 ): () => Instance | undefined {
   const [current, setCurrent] = createSignal<Instance>();
 
   createEffect(() => {
-    const instance = makeTippy(target(), untrack(() => options?.props));
+    const currentTarget = target();
+    if (currentTarget) {
+      const instance = makeTippy(currentTarget, untrack(() => options?.props));
 
-    setCurrent(instance);
+      setCurrent(instance);
 
-    createComputed(() => {
-      if (options?.disabled) {
-        instance.disable();
-      } else {
-        instance.enable();
-      }
-    });
-
-    createComputed(() => {
-      if (options?.hidden) {
-        instance.hide();
-      } else {
-        instance.show();
-      }
-    });
-
-    createComputed(() => {
-      instance.setProps({
-        ...(options?.props ?? {}),
+      createComputed(() => {
+        if (options?.disabled) {
+          instance.disable();
+        } else {
+          instance.enable();
+        }
       });
-    });
 
-    onCleanup(() => {
-      instance.destroy();
-    });
+      createComputed(() => {
+        if (options?.hidden) {
+          instance.hide();
+        } else {
+          instance.show();
+        }
+      });
+
+      createComputed(() => {
+        instance.setProps({
+          ...(options?.props ?? {}),
+        });
+      });
+
+      onCleanup(() => {
+        instance.destroy();
+      });
+    }
   });
 
   return () => current();
 }
 
 export function useTippyHeadless<T extends Element>(
-  target: () => T,
+  target: () => T | undefined | null,
   options?: TippyOptions,
 ): () => Instance | undefined {
   const [current, setCurrent] = createSignal<Instance>();
 
   createEffect(() => {
-    const instance = makeHeadlessTippy(target(), untrack(() => options?.props));
+    const currentTarget = target();
+    if (currentTarget) {
+      const instance = makeHeadlessTippy(currentTarget, untrack(() => options?.props));
 
-    setCurrent(instance);
+      setCurrent(instance);
 
-    createComputed(() => {
-      if (options?.disabled) {
-        instance.disable();
-      } else {
-        instance.enable();
-      }
-    });
-
-    createComputed(() => {
-      if (options?.hidden) {
-        instance.hide();
-      } else {
-        instance.show();
-      }
-    });
-
-    createComputed(() => {
-      instance.setProps({
-        ...(options?.props ?? {}),
+      createComputed(() => {
+        if (options?.disabled) {
+          instance.disable();
+        } else {
+          instance.enable();
+        }
       });
-    });
 
-    onCleanup(() => {
-      instance.destroy();
-    });
+      createComputed(() => {
+        if (options?.hidden) {
+          instance.hide();
+        } else {
+          instance.show();
+        }
+      });
+
+      createComputed(() => {
+        instance.setProps({
+          ...(options?.props ?? {}),
+        });
+      });
+
+      onCleanup(() => {
+        instance.destroy();
+      });
+    }
   });
 
   return () => current();

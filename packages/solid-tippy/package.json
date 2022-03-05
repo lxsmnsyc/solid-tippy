@@ -59,7 +59,7 @@
   },
   "peerDependencies": {
     "solid-js": "^1.2",
-    "tippy.js": "^6.3.0"
+    "tippy.js": "^6.3"
   },
   "description": "SolidJS bindings for Tippy.js",
   "repository": {
