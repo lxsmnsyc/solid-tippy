@@ -1,0 +1,23 @@
+{
+  "name": "demo",
+  "private": "true",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite preview"
+  },
+  "devDependencies": {
+    "eslint": "^8.33.0",
+    "eslint-config-lxsmnsyc": "^0.4.8",
+    "typescript": "^4.9.5",
+    "vite": "^4.1.1",
+    "vite-plugin-solid": "^2.5.0",
+    "vite-plugin-solid-styled": "^0.7.5"
+  },
+  "dependencies": {
+    "solid-js": "^1.6.10",
+    "solid-styled": "^0.7.5",
+    "solid-tippy": "0.2.0",
+    "tippy.js": "^6.3.7"
+  }
+}
