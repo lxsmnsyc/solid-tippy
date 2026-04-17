@@ -3,12 +3,17 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "examples/*"
+    "examples/*",
+    "docs"
   ],
   "devDependencies": {
-    "eslint": "^8.33.0",
-    "eslint-config-lxsmnsyc": "^0.4.8",
-    "lerna": "^6.0.3",
-    "typescript": "^4.9.5"
+    "@biomejs/biome": "^2.4.12",
+    "@changesets/cli": "^2.29.7",
+    "typescript": "^6.0.3"
+  },
+  "scripts": {
+    "cs:ver": "changeset version",
+    "cs:pub": "changeset publish",
+    "cs:add": "changeset add"
   }
 }
