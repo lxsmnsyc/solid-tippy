@@ -1,10 +1,7 @@
+import solid from '@solidjs/vite-plugin';
 import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
-import solidStyledPlugin from 'vite-plugin-solid-styled';
+import solidStyled from 'vite-plugin-solid-styled';
 
 export default defineConfig({
-  plugins: [
-    solidPlugin(),
-    solidStyledPlugin(),
-  ],
+  plugins: [solid(), solidStyled({})],
 });
