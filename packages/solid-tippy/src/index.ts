@@ -1,11 +1,6 @@
-import {
-  createComputed,
-  createEffect,
-  createSignal,
-  onCleanup,
-  untrack,
-} from 'solid-js';
-import makeTippy, { Instance, Props } from 'tippy.js';
+import { createEffect, createSignal, untrack } from 'solid-js';
+import type { Instance, Props } from 'tippy.js';
+import makeTippy from 'tippy.js';
 import makeHeadlessTippy from 'tippy.js/headless';
 
 export interface TippyOptions {
@@ -14,162 +9,115 @@ export interface TippyOptions {
   props?: Partial<Props>;
 }
 
-export function tippy<T extends Element>(
-  target: T,
-  opts: () => TippyOptions | undefined,
-): void {
-  createEffect(() => {
-    const options = opts();
-    const instance = makeTippy(target, untrack(() => options?.props));
+type CreateInstance = (target: Element, props?: Partial<Props>) => Instance;
 
-    createComputed(() => {
-      if (options?.disabled) {
-        instance.disable();
-      } else {
-        instance.enable();
-      }
-    });
+function bindInstance(
+  create: CreateInstance,
+  target: () => Element | undefined | null,
+  options: () => TippyOptions | undefined,
+): () => Instance | undefined {
+  const [instance, setInstance] = createSignal<Instance>();
 
-    createComputed(() => {
-      if (options?.hidden) {
-        instance.hide();
-      } else {
-        instance.show();
-      }
-    });
+  // The instance lives as long as the target. Changing the target destroys the
+  // old instance, and so does disposing the owner.
+  createEffect(target, (current) => {
+    if (!current) {
+      setInstance(undefined);
+      return undefined;
+    }
+    // Props are read untracked here. The effect below applies later changes.
+    const created = untrack(() => create(current, { ...options()?.props }));
+    setInstance(created);
 
-    createComputed(() => {
-      instance.setProps({
-        ...(options?.props ?? {}),
-      });
-    });
-
-    onCleanup(() => {
-      instance.destroy();
-    });
+    return () => {
+      created.destroy();
+    };
   });
+
+  // Props changes update the live instance instead of recreating it. The spread
+  // reads each prop here, so a getter or store field is tracked on its own.
+  createEffect(
+    () => [instance(), { ...options()?.props }] as const,
+    ([current, props]) => {
+      if (current) {
+        current.setProps(props);
+      }
+    },
+  );
+
+  createEffect(
+    () => [instance(), options()?.disabled] as const,
+    ([current, isDisabled]) => {
+      if (current) {
+        if (isDisabled) {
+          current.disable();
+        } else {
+          current.enable();
+        }
+      }
+    },
+  );
+
+  // `hidden` only controls the instance once it is set. Left undefined, the
+  // instance opens and closes on its own triggers.
+  createEffect(
+    () => [instance(), options()?.hidden] as const,
+    ([current, isHidden]) => {
+      if (current && isHidden !== undefined) {
+        if (isHidden) {
+          current.hide();
+        } else {
+          current.show();
+        }
+      }
+    },
+  );
+
+  return instance;
 }
 
-export function tippyHeadless<T extends Element>(
-  target: T,
-  opts: () => TippyOptions | undefined,
-): void {
-  createEffect(() => {
-    const options = opts();
-    const instance = makeHeadlessTippy(target, untrack(() => options?.props));
+function createRefBinding(
+  create: CreateInstance,
+  options: () => TippyOptions | undefined,
+): (target: Element) => void {
+  const [target, setTarget] = createSignal<Element>();
 
-    createComputed(() => {
-      if (options?.disabled) {
-        instance.disable();
-      } else {
-        instance.enable();
-      }
-    });
+  bindInstance(create, target, options);
 
-    createComputed(() => {
-      if (options?.hidden) {
-        instance.hide();
-      } else {
-        instance.show();
-      }
-    });
-
-    createComputed(() => {
-      instance.setProps({
-        ...(options?.props ?? {}),
-      });
-    });
-
-    onCleanup(() => {
-      instance.destroy();
-    });
-  });
+  return (element) => {
+    setTarget(() => element);
+  };
 }
 
-export function useTippy<T extends Element>(
-  target: () => T | undefined | null,
+/**
+ * Returns a `ref` callback that attaches a Tippy instance to the element.
+ * Call it in a component body: `<button ref={tippy(() => ({ props }))} />`.
+ */
+export function tippy(options: () => TippyOptions | undefined): (target: Element) => void {
+  return createRefBinding(makeTippy, options);
+}
+
+/** Same as `tippy`, with the headless build of Tippy.js. */
+export function tippyHeadless(options: () => TippyOptions | undefined): (target: Element) => void {
+  return createRefBinding(makeHeadlessTippy, options);
+}
+
+/**
+ * Attaches a Tippy instance to the element that `target` returns, and returns
+ * an accessor for the instance. Pass an object with getters, or a store, to
+ * make `options` reactive.
+ */
+export function useTippy(
+  target: () => Element | undefined | null,
   options?: TippyOptions,
 ): () => Instance | undefined {
-  const [current, setCurrent] = createSignal<Instance>();
-
-  createEffect(() => {
-    const currentTarget = target();
-    if (currentTarget) {
-      const instance = makeTippy(currentTarget, untrack(() => options?.props));
-
-      setCurrent(instance);
-
-      createComputed(() => {
-        if (options?.disabled) {
-          instance.disable();
-        } else {
-          instance.enable();
-        }
-      });
-
-      createComputed(() => {
-        if (options?.hidden) {
-          instance.hide();
-        } else {
-          instance.show();
-        }
-      });
-
-      createComputed(() => {
-        instance.setProps({
-          ...(options?.props ?? {}),
-        });
-      });
-
-      onCleanup(() => {
-        instance.destroy();
-      });
-    }
-  });
-
-  return () => current();
+  return bindInstance(makeTippy, target, () => options);
 }
 
-export function useTippyHeadless<T extends Element>(
-  target: () => T | undefined | null,
+/** Same as `useTippy`, with the headless build of Tippy.js. */
+export function useTippyHeadless(
+  target: () => Element | undefined | null,
   options?: TippyOptions,
 ): () => Instance | undefined {
-  const [current, setCurrent] = createSignal<Instance>();
-
-  createEffect(() => {
-    const currentTarget = target();
-    if (currentTarget) {
-      const instance = makeHeadlessTippy(currentTarget, untrack(() => options?.props));
-
-      setCurrent(instance);
-
-      createComputed(() => {
-        if (options?.disabled) {
-          instance.disable();
-        } else {
-          instance.enable();
-        }
-      });
-
-      createComputed(() => {
-        if (options?.hidden) {
-          instance.hide();
-        } else {
-          instance.show();
-        }
-      });
-
-      createComputed(() => {
-        instance.setProps({
-          ...(options?.props ?? {}),
-        });
-      });
-
-      onCleanup(() => {
-        instance.destroy();
-      });
-    }
-  });
-
-  return () => current();
+  return bindInstance(makeHeadlessTippy, target, () => options);
 }

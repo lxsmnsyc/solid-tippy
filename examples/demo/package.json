@@ -1,23 +1,23 @@
 {
   "name": "demo",
-  "private": "true",
+  "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "vite preview"
-  },
-  "devDependencies": {
-    "eslint": "^8.33.0",
-    "eslint-config-lxsmnsyc": "^0.4.8",
-    "typescript": "^4.9.5",
-    "vite": "^4.1.1",
-    "vite-plugin-solid": "^2.5.0",
-    "vite-plugin-solid-styled": "^0.7.5"
+    "start": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "solid-js": "^1.6.10",
-    "solid-styled": "^0.7.5",
-    "solid-tippy": "0.2.0",
+    "@solidjs/web": "2.0.0",
+    "solid-js": "2.0.0",
+    "solid-styled": "^1.0.0",
+    "solid-tippy": "workspace:*",
     "tippy.js": "^6.3.7"
+  },
+  "devDependencies": {
+    "@solidjs/vite-plugin": "3.0.0",
+    "unplugin-solid-styled": "^1.0.0",
+    "vite": "^8.3.8"
   }
 }
