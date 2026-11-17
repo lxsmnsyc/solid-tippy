@@ -20,3 +20,4 @@ minimumReleaseAgeExclude:
   - '@solidjs/web@2.0.0'
   - solid-js@2.0.0
   - solid-styled@1.0.0
+  - unplugin-solid-styled@1.0.0
